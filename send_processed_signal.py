@@ -7,31 +7,30 @@ from pylsl import StreamInfo, StreamOutlet
 import time
 import os
 
-pasta_dados = os.path.join(os.path.dirname(__file__), 'test_data')
-svm_model = joblib.load(os.path.join(pasta_dados, 'svm_model.pkl'))
+pasta_dados   = os.path.join(os.path.dirname(__file__), 'test_data')
+svm_model     = joblib.load(os.path.join(pasta_dados, 'svm_model.pkl'))
 tangent_space = joblib.load(os.path.join(pasta_dados, 'tangent_space.pkl'))
 
 # Função para criar um filtro Butterworth
 def butter_bandpass(lowcut, highcut, fs, order=3):
-    nyquist = 0.5 * fs
-    b, a = butter(order, [lowcut / nyquist, highcut / nyquist], btype='band')
+    nyquist   = 0.5 * fs
+    b, a      = butter(order, [lowcut / nyquist, highcut / nyquist], btype='band')
     return b, a
 
 # Função para aplicar o filtro aos dados usando filtfilt
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=3):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = filtfilt(b, a, data, axis=0)
+    b, a      = butter_bandpass(lowcut, highcut, fs, order=order)
+    y         = filtfilt(b, a, data, axis=0)
     return y
 
 # Parâmetros do arquivo
+filename      = 'motor_mi_EG102_online_5c.csv'
+df            = pd.read_csv(os.path.join(pasta_dados, filename), low_memory=False)
 
-filename = 'motor_mi_EG102_online_5c.csv'
-df = pd.read_csv(os.path.join(pasta_dados, filename), low_memory=False)
-
-Fs = 512  # Taxa de amostragem em Hz
+Fs            = 512  # Taxa de amostragem em Hz
 
 # Parâmetros de eventos e colunas
-colunas_dados = ['Channel ' + str(i) for i in range(1, 17)]
+colunas_dados  = ['Channel ' + str(i) for i in range(1, 17)]
 dados_sensores = df[colunas_dados].values
 
 # Parâmetros de filtragem e de aumentação de dados
@@ -48,7 +47,7 @@ for band, (lowcut, highcut) in bands.items():
 
 # LSL Configurações para saída dos resultados, usando as mesmas especificações iniciais
 sampling_rate = 50  # Taxa de amostragem conforme o exemplo original
-info = StreamInfo('SineWave', 'EEG', 3, sampling_rate, 'float32', 'myuid34234')
+info = StreamInfo('Signal', 'EEG', 3, sampling_rate, 'float32', 'myuid34234')
 outlet = StreamOutlet(info)
 print("Enviando dados de inferência via LSL...")
 
