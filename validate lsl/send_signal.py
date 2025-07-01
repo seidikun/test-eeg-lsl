@@ -6,7 +6,7 @@ import time
 FS = 2500
 N_CHANS = 10
 SIG_TYPE = 'complexo'
-DURATION = 20
+DURATION = 10
 
 t = np.arange(0, DURATION, 1/FS)
 sinais = []
