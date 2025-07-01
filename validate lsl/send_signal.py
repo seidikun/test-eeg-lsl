@@ -3,10 +3,10 @@ import numpy as np
 import pandas as pd
 import time
 
-FS = 250
-N_CHANS = 4
+FS = 2500
+N_CHANS = 10
 SIG_TYPE = 'complexo'
-DURATION = 30
+DURATION = 20
 
 t = np.arange(0, DURATION, 1/FS)
 sinais = []
