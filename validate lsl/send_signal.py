@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import time
 
-FS = 2500
-N_CHANS = 10
+FS       = 2500
+N_CHANS  = 10
 SIG_TYPE = 'complexo'
 DURATION = 10
 
