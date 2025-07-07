@@ -4,11 +4,11 @@ import time
 from pylsl import StreamInfo, StreamOutlet
 
 # Parâmetros gerais
-frequencias = [20, 50, 100, 200, 1000]  # Hz
+frequencias = [20, 50, 100, 200, 1000]
 num_canais_list = [1, 5, 15, 20]
-duracao = 5  # segundos
-repeticoes = 1
-sig_type = 'complexo'  # 'seno' ou 'complexo'
+duracao = 15  # segundos
+repeticoes = 5
+sig_type = 'complexo'
 
 freq_markers = {'A': 0.7, 'B': 1.2, 'C': 2.0}
 
@@ -47,39 +47,48 @@ for freq in frequencias:
    tempos_marcadores.sort(key=lambda x: x['tempo'])
    prox_marker = 0
 
-   print(f"\n>>> Iniciando Transmissão {rep}/3 | {freq}Hz | {num_canais} canais <<<")
-
+   print(f"\n>>> Iniciando Transmissão {rep}/5 | {freq}Hz | {num_canais} canais <<<")
    sequencia_testes.append({'frequencia': freq, 'num_canais': num_canais, 'repeticao': rep, 'duracao': duracao})
 
    start_time = time.time()
+   registros = []
 
    for i in range(len(t)):
     sample = sinais[i, :].tolist()
     sample += [0.0] * (num_canais_max - num_canais)
     lsl_timestamp = start_time + t[i]
 
+    marker_to_send = ''
+
     if i == 0:
-     marker_outlet.push_sample([f'START_{freq}Hz_{num_canais}ch_rep{rep}'], lsl_timestamp)
+     marker_to_send = f'START_{freq}Hz_{num_canais}ch_rep{rep}'
+     marker_outlet.push_sample([marker_to_send], lsl_timestamp)
+
+    while prox_marker < len(tempos_marcadores) and abs(t[i] - tempos_marcadores[prox_marker]['tempo']) < (1/freq)/2:
+     marker_to_send = tempos_marcadores[prox_marker]['identidade']
+     marker_outlet.push_sample([marker_to_send], lsl_timestamp)
+     prox_marker += 1
 
     outlet.push_sample(sample, lsl_timestamp)
 
-    while prox_marker < len(tempos_marcadores) and abs(t[i] - tempos_marcadores[prox_marker]['tempo']) < (1/freq)/2:
-     marker_outlet.push_sample([tempos_marcadores[prox_marker]['identidade']], lsl_timestamp)
-     prox_marker += 1
+    registros.append({
+     **{f'ch{k+1}': sample[k] for k in range(num_canais)},
+     'lsl_timestamp': lsl_timestamp,
+     'frequencia': freq,
+     'num_canais': num_canais,
+     'repeticao': rep,
+     'marker': marker_to_send
+    })
 
     if i < len(t) - 1:
      dt = t[i+1] - t[i]
      if dt > 0:
       time.sleep(dt)
 
-   marker_outlet.push_sample([f'END_{freq}Hz_{num_canais}ch_rep{rep}'], start_time + duracao)
+   end_marker = f'END_{freq}Hz_{num_canais}ch_rep{rep}'
+   marker_outlet.push_sample([end_marker], start_time + duracao)
 
-   df_sinais = pd.DataFrame(sinais, columns=[f'ch{i+1}' for i in range(num_canais)])
-   df_sinais['lsl_timestamp'] = start_time + t
-   df_sinais['frequencia'] = freq
-   df_sinais['num_canais'] = num_canais
-   df_sinais['repeticao'] = rep
-
+   df_sinais = pd.DataFrame(registros)
    nome_arquivo = f'sinais_enviados_{freq}Hz_{num_canais}ch_rep{rep}.csv'
    df_sinais.to_csv(nome_arquivo, index=False)
    print(f"Sinais salvos em {nome_arquivo}")
@@ -87,7 +96,5 @@ for freq in frequencias:
    time.sleep(2)
 
 print("\nTodas as transmissões concluídas.")
-
-df_sequencia = pd.DataFrame(sequencia_testes)
-df_sequencia.to_csv('sequencia_testes.csv', index=False)
-print("Sequência de testes salva em 'sequencia_testes.csv'.")
+pd.DataFrame(sequencia_testes).to_csv('sequencia_testes.csv', index=False)
+print("Sequência de testes salva.")
