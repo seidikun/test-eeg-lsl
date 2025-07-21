@@ -4,17 +4,18 @@ import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 import glob
 
-recv = pd.read_csv('dados_recebidos_teste_params.csv', on_bad_lines='skip', low_memory=False)
+recv = pd.read_csv('dados_recebidos_teste_params.csv', )
 recv = recv[recv['lsl_timestamp'] > 1e8].reset_index(drop=True)
 recv_chans = [col for col in recv.columns if col.startswith('ch')]
 
 recv_markers = recv[~recv['marker'].isna() & (recv['marker'] != '')][['lsl_timestamp', 'marker']].reset_index(drop=True)
+recv_markers['marker'] = recv_markers['marker'].astype(str)  # <-- converte para string
 recv_signal = recv[recv['marker'].isna() | (recv['marker'] == '')].reset_index(drop=True)
 
 sequencia = pd.read_csv('sequencia_testes.csv')
 files_send = {f"{row['frequencia']}Hz_{row['num_canais']}ch_rep{row['repeticao']}": f
               for f in glob.glob('sinais_enviados_*.csv')
-              for _, row in sequencia.iterrows()
+                for _, row in sequencia.iterrows()
               if f.endswith(f"{row['frequencia']}Hz_{row['num_canais']}ch_rep{row['repeticao']}.csv")}
 
 start_markers = recv_markers[recv_markers['marker'].str.startswith('START')]
@@ -77,6 +78,7 @@ param_list = sorted(param_grid.keys())
 
 with plt.rc_context({'axes.titlesize': 10, 'axes.labelsize': 9, 'xtick.labelsize': 8, 'ytick.labelsize': 8, 'legend.fontsize': 8}):
     fig, axs = plt.subplots(len(param_list), 3, figsize=(10, 3 * len(param_list)), squeeze=False)
+
 
     for idx, (freq, canais) in enumerate(param_list):
         send_diffs, recv_diffs, send_block, recv_block = param_grid[(freq, canais)]

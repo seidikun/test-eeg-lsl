@@ -6,13 +6,13 @@ import time
 def main():
  print("Buscando streams de EEG e Markers (pelo 'type')...")
 
- eeg_streams = resolve_byprop('type', 'EEG', timeout=10)
+ eeg_streams = resolve_byprop('type', 'EEG')
  if not eeg_streams:
   print("Nenhum stream EEG encontrado!")
   return
- eeg_inlet = StreamInlet(eeg_streams[-1])
+ eeg_inlet = StreamInlet(eeg_streams[-1], )
 
- marker_streams = resolve_byprop('type', 'Markers', timeout=10)
+ marker_streams = resolve_byprop('type', 'Markers')
  if not marker_streams:
   print("Nenhum stream Markers encontrado!")
   return

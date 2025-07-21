@@ -4,9 +4,9 @@ import time
 from pylsl import StreamInfo, StreamOutlet
 
 # Parâmetros gerais
-frequencias = [20, 50, 100, 200, 1000]  # Hz
-num_canais_list = [1, 5, 15, 20]
-duracao = 5  # segundos
+frequencias = [20,80,320,1280]  # Hz
+num_canais_list = [5]
+duracao = 10  # segundos
 repeticoes = 1
 sig_type = 'complexo'  # 'seno' ou 'complexo'
 
