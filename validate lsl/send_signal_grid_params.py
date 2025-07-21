@@ -4,22 +4,22 @@ import time
 from pylsl import StreamInfo, StreamOutlet
 
 # Parâmetros gerais
-frequencias = [20,80,320,1280]  # Hz
+frequencias     = [20,80,320,1280]  # Hz
 num_canais_list = [5]
-duracao = 10  # segundos
-repeticoes = 1
-sig_type = 'complexo'  # 'seno' ou 'complexo'
+duracao         = 10  # segundos
+repeticoes      = 1
+sig_type        = 'complexo'  # 'seno' ou 'complexo'
 
-freq_markers = {'A': 0.7, 'B': 1.2, 'C': 2.0}
+freq_markers    = {'A': 0.7, 'B': 1.2, 'C': 2.0}
 
-num_canais_max = max(num_canais_list)
-freq_max = max(frequencias)
+num_canais_max  = max(num_canais_list)
+freq_max        = max(frequencias)
 
-info = StreamInfo('TestStream', 'EEG', num_canais_max, freq_max, 'float32', 'stream_global')
-outlet = StreamOutlet(info)
+info            = StreamInfo('TestStream', 'EEG', num_canais_max, freq_max, 'float32', 'stream_global')
+outlet          = StreamOutlet(info)
 
-marker_info = StreamInfo('Markers', 'Markers', 1, 0, 'string', 'marker_global')
-marker_outlet = StreamOutlet(marker_info)
+marker_info     = StreamInfo('Markers', 'Markers', 1, 0, 'string', 'marker_global')
+marker_outlet   = StreamOutlet(marker_info)
 
 sequencia_testes = []
 
