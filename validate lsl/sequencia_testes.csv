@@ -1,5 +1,5 @@
-frequencia,num_canais,repeticao,duracao
-20,5,1,10
-80,5,1,10
-320,5,1,10
-1280,5,1,10
+frequencia,num_canais,duracao
+40,5,20
+80,5,20
+320,5,20
+1280,5,20
